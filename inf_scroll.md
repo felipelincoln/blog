@@ -252,6 +252,42 @@ Finally we can add the button:
 
 We have already a paginated feed! We are almost there.
 
+![](https://i.imgur.com/H0TjCnh.gif)
+
+## JS Hooks, the end!!
+Now we will get rid of the button and load content as we scroll.  
+
+Lets first define a JavaScript function that get our current scroll position.
+
+```javascript
+let scrollAt = () => {
+  let scrollTop = document.documentElement.scrollTop || document.body.scrollTop
+  let scrollHeight = document.documentElement.scrollHeight || document.body.scrollHeight
+  let clientHeight = document.documentElement.clientHeight
+
+  return scrollTop / (scrollHeight - clientHeight) * 100
+}
+```
+
+Press `F12` on our project browser tab and paste the code above in the console, and see what it does.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
