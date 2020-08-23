@@ -201,7 +201,56 @@ iex(3)> InfScroll.Digimons.list_digimons() |> Enum.chunk_every(5) |> List.pop_at
 Divide our list into chunks of length 5, then pop the 2-index item from this list. `List.pop_at/2` returns a tuple `{poped_item, new_list}`, that's why we needed that annonymous function at the end. Got it? :wink:  
 Now that we have our paginate logic implemented, lets create a button to load more content.
 
+We need to store the state of our feed, we do this by assigning `page` to `mount`'s socket. We also want to use the `feed` assign to hold the new
+content that will be added to the feed, so we need to put `temporary_assigns: [feed: []]` to our returning tuple, this will restore to `[]` after the feed content
+is rendered.
 
+```elixir
+def mount(_params, _session, socket) do
+  feed = Digimons.list_digimons(0)
+  socket = assign(socket, feed: feed, page: 0)
+
+  {:ok, socket, temporary_assigns: [feed: []]}
+end
+```
+
+We also havo to set the phoenix binding `phx-update="append"` (default is `replace`) to our container div in the `render` template. This will append our
+new items to the end of the feed rather than replacing it all. In order to use this feature we also have to provide an unique DOM ID to the container div and to
+each item on our feed.
+
+```elixir
+def render(assigns) do
+  ~L"""
+  <div id="feed" phx-update="append">
+  <%= for i <- @feed do %>
+    <div id="<%= i.name %>"
+         style="padding:15px; border:1px solid lightgrey; border-radius: 15px; width: 250px; margin: 10px auto">
+  ...
+  """
+end
+```
+
+Finally we can add the button:
+
+```elixir
+  def render(assigns) do
+    ~L"""
+    ...
+    <button phx-click="load-more">Load more</button>
+    """
+  end
+
+  def handle_event("load-more", _params, %{assigns: %{page: page}} = socket) do
+    new_page = page + 1
+    new_feed = Digimons.list_digimons(new_page)
+    socket = assign(socket, feed: new_feed, page: new_page)
+
+    {:noreply, socket}
+  end
+
+```
+
+We have already a paginated feed! We are almost there.
 
 
 
