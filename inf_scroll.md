@@ -305,15 +305,26 @@ Hooks.InfiniteScroll = {
 }
 ```
 
+Now make sure to include this Hooks object into the socket, that is right below `csrf_token`.
 
+```javascript
+let liveSocket = new LiveSocket("/live", Socket, {hooks: Hooks, params: {_csrf_token: csrfToken}})
+```
 
+In the render template at `lib/inf_scroll_web/live/scroll_live.ex`, we need to include `phx-hook="InfiniteScroll" data-page="<%= @page %>"` to the container div and we can get rid of the "load more" button.
 
+```elixir
+  def render(assigns) do
+    ~L"""
+    <div id="feed" phx-update="append" phx-hook="InfiniteScroll" data-page="<%= @page %>">
+    ...
+    </div>
+    """
+  end
 
+```
 
-
-
-
-
+## That's it!
 
 
 
