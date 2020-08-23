@@ -203,7 +203,7 @@ defmodule InfScroll.Digimons do
       },
       %{
         category: :ultimate,
-        name: "hercules-kabuterimon"
+        name: "herculeskabuterimon"
       },
       %{
         category: :ultimate,
@@ -219,11 +219,11 @@ defmodule InfScroll.Digimons do
       },
       %{
         category: :ultimate,
-        name: "metal-greymon"
+        name: "metalgreymon"
       },
       %{
         category: :ultimate,
-        name: "metal-mamemon"
+        name: "metalmamemon"
       },
       %{
         category: :ultimate,
@@ -239,7 +239,7 @@ defmodule InfScroll.Digimons do
       },
       %{
         category: :ultimate,
-        name: "skull-greymon"
+        name: "skullgreymon"
       },
       %{
         category: :ultimate,
