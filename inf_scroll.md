@@ -325,7 +325,7 @@ In the render template at `lib/inf_scroll_web/live/scroll_live.ex`, we need to i
 ```
 
 ## That's it!
+![](https://i.imgur.com/SGgxHbs.gif)
 
-
-
+\*I did not handle the case where we reach the end of the feed, I am waiting for your pull request :wink:
 
