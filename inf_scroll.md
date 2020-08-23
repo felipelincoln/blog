@@ -269,14 +269,41 @@ let scrollAt = () => {
 }
 ```
 
-Press `F12` on our project browser tab and paste the code above in the console, and see what it does.
+Press `F12` in your phoenix project browser tab and paste the code above in the console, and see what it does.
 
+![](https://i.imgur.com/kK2RQL2.gif)
 
+We will refer to this function soon.  
+The last thing we need to do is setup a [javascript hook](https://hexdocs.pm/phoenix_live_view/js-interop.html). The key here is to add an event listener to
+`window` to listen to the `scroll` event, when the `scrollAt()` returns a value greater than 90, we are going to fire an event to the server using `pushEvent("load-more", {})`. All this functionality will be passed to the `LiveSocket` instance via `hooks`.  
 
+The following snippet will do the trick, put this after the imports in your `assets/js/app.js`
 
+```javascript
+let scrollAt = () => {
+  let scrollTop = document.documentElement.scrollTop || document.body.scrollTop
+  let scrollHeight = document.documentElement.scrollHeight || document.body.scrollHeight
+  let clientHeight = document.documentElement.clientHeight
 
+  return scrollTop / (scrollHeight - clientHeight) * 100
+}
 
-
+let Hooks = {}
+Hooks.InfiniteScroll = {
+  page() { return this.el.dataset.page },
+  mounted(){
+    this.pending = this.page()
+    window.addEventListener("scroll", e => {
+      if(this.pending == this.page() && scrollAt() > 90){
+        this.pending = this.page() + 1
+        this.pushEvent("load-more", {})
+      }
+    })
+  },
+  reconnected(){ this.pending = this.page() },
+  updated(){ this.pending = this.page() }
+}
+```
 
 
 
