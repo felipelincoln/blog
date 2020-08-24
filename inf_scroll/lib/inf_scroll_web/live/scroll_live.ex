@@ -30,11 +30,10 @@ defmodule InfScrollWeb.ScrollLive do
   end
 
   def handle_event("load-more", _params, %{assigns: %{page: page}} = socket) do
-    new_page = page + 1
-    new_feed = Digimons.list_digimons(new_page)
-    socket = assign(socket, feed: new_feed, page: new_page)
-
-    {:noreply, socket}
+    case Digimons.list_digimons(page + 1) do
+      [] -> {:noreply, socket}
+      new_feed -> {:noreply, assign(socket, feed: new_feed, page: page + 1)}
+    end
   end
 
   defp get_color(category) do

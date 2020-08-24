@@ -4,7 +4,7 @@ defmodule InfScroll.Digimons do
     list_digimons()
     |> Enum.chunk_every(per_page)
     |> List.pop_at(page)
-    |> (fn {item, _new_list} -> item end).()
+    |> (fn {item, _new_list} -> item || [] end).()
   end
 
   def list_digimons do
