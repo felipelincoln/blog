@@ -29,7 +29,7 @@ defmodule InfScroll.Digimons do
   end
 end
 ```
-Just drop [this file](inf_scroll/lib/inf_scroll/digimons.ex) in your `inf_scroll/lib/inf_scroll/` folder and we can hit the ground running.
+Just drop [this file](https://raw.githubusercontent.com/felipelincoln/blog/649fa3aee065e8c4976d3d421b92c5f9d549facc/inf_scroll/lib/inf_scroll/digimons.ex) in your `inf_scroll/lib/inf_scroll/` folder and we can hit the ground running.
 
 ## Creating our page
 Lets define our first live page. Go to `inf_scroll/lib/inf_scroll_web/router.ex` and add below `live "/", PageLive, :index` the following line:
@@ -130,7 +130,7 @@ def list_digimons(page, per_page \\ 10) do
   list_digimons()
   |> Enum.chunk_every(per_page)
   |> List.pop_at(page)
-  |> (fn {item, _new_list} -> item end).()
+  |> (fn {item, _new_list} -> item || [] end).()
 end
 ```
 
@@ -187,7 +187,7 @@ iex(2)> InfScroll.Digimons.list_digimons() |> Enum.chunk_every(5) |> List.pop_at
    ],
    ...
  ]}
-iex(3)> InfScroll.Digimons.list_digimons() |> Enum.chunk_every(5) |> List.pop_at(2) |> (fn {item, _new_list} -> item end).()
+iex(3)> InfScroll.Digimons.list_digimons() |> Enum.chunk_every(5) |> List.pop_at(2) |> (fn {item, _new_list} -> item || [] end).()
 [
   %{category: :rookie, name: "elecmon"},
   %{category: :rookie, name: "gabumon"},
@@ -199,7 +199,7 @@ iex(3)> InfScroll.Digimons.list_digimons() |> Enum.chunk_every(5) |> List.pop_at
 ```
 
 Divide our list into chunks of length 5, then pop the 2-index item from this list. `List.pop_at/2` returns a tuple `{poped_item, new_list}`, that's why we needed that annonymous function at the end. Got it? :wink:  
-Now that we have our paginate logic implemented, lets create a button to load more content.
+Now that we have our paginate logic implemented, let's create a button to load more content.
 
 We need to store the state of our feed, we do this by assigning `page` to `mount`'s socket. We also want to use the `feed` assign to hold the new
 content that will be added to the feed, so we need to put `temporary_assigns: [feed: []]` to our returning tuple, this will restore to `[]` after the feed content
@@ -241,12 +241,12 @@ Finally we can add the button:
   end
 
   def handle_event("load-more", _params, %{assigns: %{page: page}} = socket) do
-    new_page = page + 1
-    new_feed = Digimons.list_digimons(new_page)
-    socket = assign(socket, feed: new_feed, page: new_page)
-
-    {:noreply, socket}
+    case Digimons.list_digimons(page + 1) do
+      [] -> {:noreply, socket}
+      new_feed -> {:noreply, assign(socket, feed: new_feed, page: page + 1)}
+    end
   end
+
 
 ```
 
@@ -326,6 +326,3 @@ In the render template at `lib/inf_scroll_web/live/scroll_live.ex`, we need to i
 
 ## That's it!
 ![](https://i.imgur.com/SGgxHbs.gif)
-
-\*I did not handle the case where we reach the end of the feed, I am waiting for your pull request :wink:
-
