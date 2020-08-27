@@ -89,7 +89,8 @@ If we try to just start a container from this image: `docker run --rm easy_compo
 configure it inside the docker-compose. Let's start with it.
 
 ## Creating the docker-compose
-The first structure we can think of is as follows
+The first structure we can think of is as follows:  
+Create a file called `docker-compose.yml` containing these lines.
 
 ```yml
 version: '3.7'
@@ -110,19 +111,86 @@ services:
 volumes:
   postgres_data:
 ```
+And try to run the containers: `docker-compose up`  
+Sadly this won't work. :worried: , `CRTL + C` to stop the containers and run `docker-compose down` to remove the stopped containers.
 
-but sadly this won't work. :worried:  
 First, the database container was started with no user password. Since we are in development environment we shouldn't care about database passwords, so we pass
 the following environment variable: `POSTGRES_HOST_AUTH_METHOD=trust` in order to allow container start without a password.  
-Second problem was our application was trying to compile again, it seems like it could't find the `_build/` and `deps/` folder
 
+Second problem was our application was trying to compile again, it seems like it could't find the `_build/` and `deps/` folder and that's because after we
+built our image, docker-compose is mounting our machine folder `easy_compose/` entirely to the container working directory `app/`, but this ends up erasing all
+artifacts generated at building stage. To prevent this behaviour we gotta add more volumes to the `web` service. This way our container
+can access his `_build/` and `deps/` inside our machine `/var/lib/docker/volumes/` rather than the `easy_compose/` folder.  
+After all the changes we should get the following `docker-compose.yml`
 
+```yml
+version: '3.7'
 
+services:
+  web:
+    build: .
+    volumes:
+      - .:/app
+      - /app/_build
+      - /app/deps
+      - /app/priv/static
+      - /app/assets/node_modules
+    ports:
+      - 4000:4000
+    depends_on:
+      - db
+  db:
+    image: postgres:12
+    environment:
+      - POSTGRES_HOST_AUTH_METHOD=trust
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+volumes:
+  postgres_data:
+```
 
+If we try to run again we will see that the database is started but we still got an error
+```
+web_1  | [error] Postgrex.Protocol (#PID<0.367.0>) failed to connect: ** (DBConnection.ConnectionError) tcp connect (localhost:5432): connection refused - :econnrefused
 
+```
+It's because we han't configured our application to fetch our database. We can do this by going to `config/dev.exs` and changing the `hostname` from 
+`localhost` to our service name, which is `db`.  
 
+```elixir
+# Configure your database
+config :easy_compose, EasyCompose.Repo,
+  username: "postgres",
+  password: "postgres",
+  database: "easy_compose_dev",
+  hostname: "db",
+  show_sensitive_data_on_connection_error: true,
+  pool_size: 10
 
+```
 
+Stop docker-compose, `CRTL + C`, make the changes (in `config/dev.exs`) and start it again, `docker-compose up`.  
+Now we got another error:
+```
+db_1   | 2020-08-27 12:36:11.978 UTC [43] FATAL:  database "easy_compose_dev" does not exist
+web_1  | [error] Postgrex.Protocol (#PID<0.449.0>) failed to connect: ** (Postgrex.Error) FATAL 3D000 (invalid_catalog_name) database "easy_compose_dev" does not exist
+```
+
+But this is just because we didn't created the database. Stop the container once again and now run
+
+```
+docker-compose run web mix ecto.create
+```
+
+And start docker-compose again
+```
+docker-compose up
+```
+
+No errors this time! :tada::tada::tada:  
+Go to 127.0.0.1:4000 and you have a working application on development enviroment. :sunglasses:
+
+![](https://i.imgur.com/20LVnuP.png)
 
 
 
