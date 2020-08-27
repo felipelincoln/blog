@@ -188,7 +188,7 @@ docker-compose up
 ```
 
 No errors this time! :tada::tada::tada:  
-Go to 127.0.0.1:4000 and you have a working application on development enviroment. :sunglasses:
+Go to http://127.0.0.1:4000 and you have a working phoenix application on docker-compose. :sunglasses:
 
 ![](https://i.imgur.com/20LVnuP.png)
 
