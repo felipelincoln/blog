@@ -2,7 +2,7 @@
 ![](https://hsto.org/webt/2-/ty/ok/2-tyokqzevcwzvb59ymi1qlbhfe.png)
 
 ## Creating the application
-Starting from scratch, let's create our Phoenix application
+Starting from scratch, let's create our #Phoenix application
 
 ```
 mix phx.new easy_compose
