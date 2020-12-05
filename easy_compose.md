@@ -1,8 +1,11 @@
 # Running Phoenix application in docker-compose with ease
 ![](https://hsto.org/webt/2-/ty/ok/2-tyokqzevcwzvb59ymi1qlbhfe.png)
 
+We will setup a #Phoenix application inside a #Docker container and run it on development environment.
+
+
 ## Creating the application
-Starting from scratch, let's create our #Phoenix application
+Starting from scratch, let's create our Phoenix application
 
 ```
 mix phx.new easy_compose
