@@ -1,4 +1,4 @@
-#     a\n\rd\r
-ssd\n koasdkaso       as  
+#     a\n\rd\r#tambem\n tag
+#assd\n koasdk#tag1 aso       as  #b
 sd
-dd
+dd#essa nao vai
